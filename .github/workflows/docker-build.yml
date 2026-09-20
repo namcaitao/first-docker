@@ -1,1 +1,25 @@
+# Tên workflow, hiện trên tab Actions của GitHub
+name: First Docker
 
+# "on" = KHI NÀO thì chạy workflow này
+on:
+  push:
+    branches: [main]   # chạy mỗi khi có ai push vào nhánh main
+
+# "jobs" = danh sách công việc cần làm
+jobs:
+  build:
+    runs-on: ubuntu-latest   # chạy trên 1 máy ảo Ubuntu do GitHub cấp miễn phí
+
+    steps:
+      # Bước 1: tải code của repo vào máy ảo đó
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Bước 2: build Docker image từ Dockerfile trong repo
+      - name: Build Docker image
+        run: docker build -t hello-app .
+
+      # Bước 3: chạy thử container để chắc chắn nó hoạt động
+      - name: Run container
+        run: docker run hello-app
