@@ -1,25 +1,33 @@
-# Tên workflow, hiện trên tab Actions của GitHub
-name: First Docker
+name: Docker Build
 
-# "on" = KHI NÀO thì chạy workflow này
 on:
   push:
-    branches: [main]   # chạy mỗi khi có ai push vào nhánh main
+    branches: [main]
 
-# "jobs" = danh sách công việc cần làm
 jobs:
   build:
-    runs-on: ubuntu-latest   # chạy trên 1 máy ảo Ubuntu do GitHub cấp miễn phí
+    runs-on: ubuntu-latest
 
     steps:
-      # Bước 1: tải code của repo vào máy ảo đó
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Bước 2: build Docker image từ Dockerfile trong repo
-      - name: Build Docker image
-        run: docker build -t hello-app .
+      # Bước mới: đăng nhập vào Docker Hub bằng 2 secret đã tạo
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Bước 3: chạy thử container để chắc chắn nó hoạt động
-      - name: Run container
-        run: docker run hello-app
+      # Build image, đặt tên theo dạng "tenban/ten-image:latest"
+      # THAY "namcaitao" bằng đúng username Docker Hub của bạn nếu khác
+      - name: Build Docker image
+        run: docker build -t namcaitao/hello-app:latest .
+
+      # Chạy thử để chắc chắn image hoạt động trước khi đẩy lên
+      - name: Run container (test)
+        run: docker run namcaitao/hello-app:latest
+
+      # Bước mới: đẩy image lên Docker Hub
+      - name: Push to Docker Hub
+        run: docker push namcaitao/hello-app:latest
